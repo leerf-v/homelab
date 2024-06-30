@@ -14,3 +14,6 @@ services:
       - ./homarr/data:/data
     ports:
       - '7575:7575'
+
+
+      #test
