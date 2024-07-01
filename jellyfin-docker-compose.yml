@@ -11,6 +11,8 @@ services:
       - type: bind
         source: /home/films
         target: /films
+    ports:
+      - 8920:8920    
     restart: 'unless-stopped'
     # Optional - alternative address used for autodiscovery
     #environment:
