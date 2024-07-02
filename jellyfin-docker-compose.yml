@@ -1,22 +1,15 @@
 version: '3.5'
 services:
   jellyfin:
-    image: jellyfin/jellyfin
+    image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
-    user: 1000:1000
-    network_mode: 'host'
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
     volumes:
       - /home/docker/jellyfin/config:/config
-      - /home/docker/jellyfin/cache:/cache
-      - type: bind
-        source: /home/films
-        target: /films
+      - /home/films:/data/films
     ports:
-      - 8920:8920    
-    restart: 'unless-stopped'
-    # Optional - alternative address used for autodiscovery
-    #environment:
-      #- JELLYFIN_PublishedServerUrl=http://example.com
-    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+      - 8096:8096
+    restart: unless-stopped
