@@ -1,0 +1,47 @@
+version: "3"
+services:
+
+  #GRAFANA
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    networks:
+      - monitoring_network
+    volumes:
+      - /home/docker/monitoring/grafana:/var/lib/grafana
+
+
+  #INFLUX DB
+
+  influxdb:
+    image: influxdb
+    container_name: influxdb
+    restart: unless-stopped
+    ports:
+      - 8086:8086
+      - 8089:8089/udp
+    networks:
+      - monitoring_network
+    volumes:
+      - /home/docker/monitoring/influxdb:/var/lib/influxdb
+
+  #PROMETHEUS
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - 9090:9090
+    networks:
+      - monitoring_network
+    volumes:
+      - /home/docker/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - /home/docker/monitoring/prometheus/prom-data:/prometheus
+
+networks:
+  monitoring_network:
