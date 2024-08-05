@@ -1,0 +1,85 @@
+version: "3"
+services:
+
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=ivpn
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=OIInq0teN/nWm4qtUGEbjoeyOaRAuKlHss6HOprC1HU=
+      - WIREGUARD_ADDRESSES=172.29.231.150/32
+      - SERVER_COUNTRIES=Germany
+    volumes:
+      - /home/docker/gluetun:/gluetun
+    ports:
+      - 8085:8085 #qbittorrent
+      - 6881:6881 #qbittorrent
+      - 6881:6881/udp #qbittorrent
+    restart: unless-stopped
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - WEBUI_PORT=8085
+      - TORRENTING_PORT=6881
+    volumes:
+      - /home/docker/qbittorrent/appdata:/config
+      - /home/downloads:/downloads #optional
+    network_mode: 'service:gluetun'
+    depends_on:
+      - gluetun
+    restart: unless-stopped
+
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /home/docker/radarr/config:/config
+      - /home/films:/movies #optional
+      - /home/downloads:/downloads #optional    
+    ports:
+      - 7878:7878 #radarr
+    restart: unless-stopped
+
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /home/docker/sonarr/config:/config
+      - /home/series:/tv #optional
+      - /home/downloads:/downloads #optional
+    ports:
+      - 8989:8989 #sonarr
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /home/docker/prowlarr/config:/config
+    ports:
+      - 9696:9696 #prowlarr
+    restart: unless-stopped
